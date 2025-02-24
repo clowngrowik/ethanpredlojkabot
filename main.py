@@ -1,16 +1,11 @@
-import os
+
 import logging
 import asyncio
-import pip
-import telebot
-import time
+
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import Message
 from aiogram.filters import CommandStart
 from aiogram.filters import Command
-from keep_alive import keep_alive
-
-keep_alive()
 
 
 # Замените на ваш токен бота и ID группы
