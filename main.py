@@ -14,8 +14,8 @@ from aiogram.utils.markdown import hlink
 
 
 # Замените на ваш токен бота и ID группы
-BOT_TOKEN = "7415332686:AAGT1EYLbx0PRfvVI1iaB3H0xWsZRhtw-hU"
-GROUP_ID = -1002287976614  # Не забудь поставить -100 перед ID, если это супергруппа
+BOT_TOKEN = "7960166180:AAFXC25aFpd1QDPjh1RHM1Buh5d-cmZVocI"
+GROUP_ID = -1002291091171  # Не забудь поставить -100 перед ID, если это супергруппа
 ADMIN_ID = "1810342367"
 
 # Настройка логирования
@@ -28,7 +28,7 @@ dp = Dispatcher()
 # Создаем инлайн-клавиатуру с кнопками
 menu_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[
-        [InlineKeyboardButton(text="📨 Отправить сообщение", callback_data="send_message")],
+        [InlineKeyboardButton(text="📨 Отправить видео", callback_data="send_message")],
         [InlineKeyboardButton(text="📢 Соц. сети", callback_data="social"),
          InlineKeyboardButton(text="📝 Заявка", callback_data="request"),
          InlineKeyboardButton(text="ℹ️ О боте", callback_data="about_bot")]
@@ -44,7 +44,7 @@ url_pattern = re.compile(r'^(https?://)?(www\.)?([a-zA-Z0-9-]+\.[a-zA-Z]{2,})(/.
 
 # Установка подключения к Google Sheets
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name("D:\\valued-road-451914-q7-9c2a9fd9225c.json", scope)  # Укажите путь к вашему JSON-файлу
+creds = ServiceAccountCredentials.from_json_keyfile_name("../../home/botbot/valued-road-451914-q7-0b220db6c367.json", scope)  # Укажите путь к вашему JSON-файлу
 client = gspread.authorize(creds)
 sheet = client.open("Video").sheet1  # Укажите название таблицы
 
@@ -97,7 +97,7 @@ async def edit_message_with_social_links(message: Message):
 # Обработчик кнопки "ℹ️ О боте"
 @dp.callback_query(lambda c: c.data == "about_bot")
 async def about_bot_callback_handler(callback_query: CallbackQuery):
-    text=("Этот бот для связи со стримером 99samishi\ntwitch.tv/99samishi")
+    text=("Этот бот для связи со стримером 99samishi")
     await callback_query.message.edit_text(text, reply_markup=back_button)
     await callback_query.answer()
 
@@ -116,7 +116,7 @@ async def request_button_handler(callback_query: CallbackQuery):
     
     # Отправляем сообщение с ссылкой на Google Форму
     message = await callback_query.message.answer(
-        "🔸 Пожалуйста, заполните заявку по следующей ссылке:",
+        "Пожалуйста, заполните заявку по следующей ссылке:",
         reply_markup=form_keyboard
     )
     
@@ -148,6 +148,11 @@ async def back_button_handler(callback_query: CallbackQuery):
     await callback_query.message.edit_text("📋 Главное меню:\n\nВыбери нужный пункт:", reply_markup=menu_keyboard)
     await callback_query.answer()
 
+# Функция для проверки наличия ссылки в Google Sheets
+def is_link_in_table(link):
+    links = sheet.col_values(2)  # Получаем все ссылки из второго столбца
+    return link in links
+
 
 # Пересылка сообщений от пользователя в группу с извлечением названия видео и записью в таблицу
 @dp.message(lambda message: not message.text.startswith("/"))
@@ -160,6 +165,11 @@ async def forward_to_group(message: Message):
         # Проверка, является ли сообщение ссылкой на YouTube
         if "youtube.com" not in text and "youtu.be" not in text:
             await message.answer("Ошибка! Пожалуйста, отправьте ссылку на YouTube.")
+            return
+
+        # Проверяем, есть ли ссылка уже в таблице
+        if is_link_in_table(text):
+            await message.answer("Эта ссылка уже есть в базе данных. Отправьте другую!")
             return
 
         # Извлекаем название видео с YouTube
