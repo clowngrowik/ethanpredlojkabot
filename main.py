@@ -44,7 +44,7 @@ url_pattern = re.compile(r'^(https?://)?(www\.)?([a-zA-Z0-9-]+\.[a-zA-Z]{2,})(/.
 
 # Установка подключения к Google Sheets
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name("../../home/botb/valued-road-451914-q7-ea6029d14a3b.json", scope)  # Укажите путь к вашему JSON-файлу
+creds = ServiceAccountCredentials.from_json_keyfile_name("../../home/botbb/valued-road-451914-q7-ea6029d14a3b.json", scope)  # Укажите путь к вашему JSON-файлу
 client = gspread.authorize(creds)
 sheet = client.open("Video").sheet1  # Укажите название таблицы
 
